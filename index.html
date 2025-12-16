@@ -253,13 +253,6 @@
             opacity: 1;
         }
 
-        .event-icon {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            font-size: 1rem;
-        }
-
         /* Legend */
         .legend {
             max-width: 800px;
@@ -537,10 +530,6 @@
                 font-size: 0.8rem;
             }
 
-            .event-icon {
-                font-size: 0.8rem;
-            }
-
             .event-summary {
                 padding: 15px;
             }
@@ -767,8 +756,6 @@
                 html += day;
                 
                 if (event) {
-                    var icon = event.type === 'congress' ? '★' : '✝';
-                    html += '<span class="event-icon">' + icon + '</span>';
                     html += '<div class="tooltip">' + event.title + '</div>';
                 }
                 
