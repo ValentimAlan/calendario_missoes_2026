@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendário de Missões 2026 - Igreja Chamados para Adorar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --rosa-magenta: #E13B7D;
+            --roxo-violeta: #8C52FF;
+            --azul-claro: #00AEEF;
+            --preto-suave: #2B2B2B;
+            --branco: #FFFFFF;
+            --cinza-claro: #F5F5F5;
+            --cinza-medio: #E0E0E0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--branco);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--rosa-magenta) 0%, var(--roxo-violeta) 50%, var(--azul-claro) 100%);
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--branco);
+        }
+
+        .logo-container {
+            margin-bottom: 20px;
+        }
+
+        .church-name {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--branco);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: 1px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.95;
+        }
+
+        /* Navigation */
+        .nav-container {
+            background: transparent;
+            padding: 30px 20px;
+            border-bottom: none;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .month-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .month-btn {
+            padding: 12px 24px;
+            background: var(--branco);
+            border: 2px solid var(--cinza-medio);
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--preto-suave);
+            transition: all 0.3s ease;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            touch-action: manipulation;
+            position: relative;
+            z-index: 1;
+        }
+
+        .month-btn:hover,
+        .month-btn:active {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .month-btn.active {
+            background: linear-gradient(135deg, var(--rosa-magenta), var(--roxo-violeta));
+            color: var(--branco);
+            border-color: var(--rosa-magenta);
+        }
+
+        /* Calendar */
+        .calendar-container {
+            padding: 40px 20px;
+        }
+
+        .calendar-month {
+            display: none;
+        }
+
+        .calendar-month.active {
+            display: block;
+        }
+
+        .month-title {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--preto-suave);
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, var(--rosa-magenta), var(--roxo-violeta));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .day-header {
+            text-align: center;
+            font-weight: 700;
+            padding: 15px 5px;
+            color: var(--roxo-violeta);
+            font-size: 0.9rem;
+            border-bottom: 2px solid var(--cinza-medio);
+        }
+
+        .day-cell {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            background: var(--cinza-claro);
+            color: var(--preto-suave);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .day-cell.empty {
+            background: transparent;
+        }
+
+        .day-cell.sunday {
+            color: var(--rosa-magenta);
+        }
+
+        .day-cell.event {
+            background: linear-gradient(135deg, var(--rosa-magenta), var(--roxo-violeta));
+            color: var(--branco);
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(225, 59, 125, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        .day-cell.congress {
+            background: linear-gradient(135deg, var(--azul-claro), var(--roxo-violeta));
+            color: var(--branco);
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(0, 174, 239, 0.4);
+            animation: glow 2s infinite;
+        }
+
+        .day-cell.event:hover,
+        .day-cell.congress:hover {
+            transform: scale(1.1);
+            z-index: 10;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 4px 12px rgba(225, 59, 125, 0.3);
+            }
+            50% {
+                box-shadow: 0 6px 20px rgba(225, 59, 125, 0.5);
+            }
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 6px 16px rgba(0, 174, 239, 0.4);
+            }
+            50% {
+                box-shadow: 0 8px 24px rgba(0, 174, 239, 0.6);
+            }
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--preto-suave);
+            color: var(--branco);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 100;
+            margin-bottom: 8px;
+        }
+
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: var(--preto-suave);
+        }
+
+        .day-cell:hover .tooltip {
+            opacity: 1;
+        }
+
+        .event-icon {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 1rem;
+        }
+
+        /* Legend */
+        .legend {
+            max-width: 800px;
+            margin: 40px auto 0;
+            padding: 20px;
+            background: var(--cinza-claro);
+            border-radius: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+        }
+
+        .legend-color.culto {
+            background: linear-gradient(135deg, var(--rosa-magenta), var(--roxo-violeta));
+        }
+
+        .legend-color.congresso {
+            background: linear-gradient(135deg, var(--azul-claro), var(--roxo-violeta));
+        }
+
+        .legend-text {
+            font-weight: 600;
+            color: var(--preto-suave);
+        }
+
+        /* Special Notice */
+        .event-summary {
+            max-width: 900px;
+            margin: 0 auto 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .summary-title {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--preto-suave);
+            margin-bottom: 25px;
+            background: linear-gradient(135deg, var(--rosa-magenta), var(--roxo-violeta));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .summary-item {
+            display: flex;
+            flex-direction: column;
+            padding: 15px 20px;
+            background: var(--branco);
+            border-left: 4px solid var(--rosa-magenta);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .summary-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .summary-item.congress-item {
+            border-left-color: var(--azul-claro);
+            background: linear-gradient(135deg, rgba(0, 174, 239, 0.05), rgba(140, 82, 255, 0.05));
+        }
+
+        .summary-item.special-item {
+            border-left-color: var(--roxo-violeta);
+            background: linear-gradient(135deg, rgba(140, 82, 255, 0.05), rgba(225, 59, 125, 0.05));
+        }
+
+        .summary-item.no-event {
+            border-left-color: var(--cinza-medio);
+            opacity: 0.6;
+        }
+
+        .summary-month {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--roxo-violeta);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .summary-date {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--preto-suave);
+        }
+
+        .summary-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--branco);
+            background: linear-gradient(135deg, var(--rosa-magenta), var(--roxo-violeta));
+            padding: 4px 10px;
+            border-radius: 12px;
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        .summary-item.congress-item .summary-label {
+            background: linear-gradient(135deg, var(--azul-claro), var(--roxo-violeta));
+        }
+
+        /* Special Notice */
+        .special-notice {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(225, 59, 125, 0.1), rgba(140, 82, 255, 0.1));
+            border-left: 4px solid var(--rosa-magenta);
+            border-radius: 8px;
+        }
+
+        .special-notice h3 {
+            color: var(--roxo-violeta);
+            margin-bottom: 10px;
+        }
+
+        .special-notice ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .special-notice li {
+            padding: 5px 0;
+            color: var(--preto-suave);
+        }
+
+        .special-notice li::before {
+            content: '✓ ';
+            color: var(--rosa-magenta);
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--preto-suave);
+            color: var(--branco);
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .footer h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--azul-claro);
+        }
+
+        .footer-info {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .footer-info p {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 1rem;
+        }
+
+        .footer-icon {
+            color: var(--rosa-magenta);
+            font-size: 1.2rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .logo-container .church-name {
+                font-size: 1.5rem;
+            }
+
+            .month-btn {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+
+            .calendar-grid {
+                gap: 5px;
+            }
+
+            .day-cell {
+                font-size: 0.9rem;
+            }
+
+            .day-header {
+                font-size: 0.8rem;
+                padding: 10px 2px;
+            }
+
+            .month-title {
+                font-size: 1.5rem;
+            }
+
+            .legend {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .event-summary {
+                padding: 20px;
+            }
+
+            .summary-title {
+                font-size: 1.5rem;
+            }
+
+            .summary-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 12px;
+            }
+
+            .summary-item {
+                padding: 12px 15px;
+            }
+
+            .summary-date {
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 20px 10px;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .calendar-container {
+                padding: 20px 10px;
+            }
+
+            .day-cell {
+                font-size: 0.8rem;
+            }
+
+            .event-icon {
+                font-size: 0.8rem;
+            }
+
+            .event-summary {
+                padding: 15px;
+            }
+
+            .summary-title {
+                font-size: 1.3rem;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo-container">
+                <h2 class="church-name">Igreja Chamados para Adorar</h2>
+            </div>
+            <h1>Calendário de Missões 2026</h1>
+            <p>Departamento de Missões</p>
+        </div>
+
+        <!-- Calendar -->
+        <div class="calendar-container">
+            <!-- Event Summary -->
+            <div class="event-summary">
+                <h2 class="summary-title">Resumo dos Eventos 2026</h2>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <span class="summary-month">Janeiro</span>
+                        <span class="summary-date">25/01</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-month">Fevereiro</span>
+                        <span class="summary-date">22/02</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-month">Março</span>
+                        <span class="summary-date">22/03</span>
+                    </div>
+                    <div class="summary-item congress-item">
+                        <span class="summary-month">Abril</span>
+                        <span class="summary-date">25 e 26/04</span>
+                        <span class="summary-label">Congresso</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-month">Maio</span>
+                        <span class="summary-date">24/05</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-month">Junho</span>
+                        <span class="summary-date">28/06</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-month">Julho</span>
+                        <span class="summary-date">26/07</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-month">Agosto</span>
+                        <span class="summary-date">23/08</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-month">Setembro</span>
+                        <span class="summary-date">27/09</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-month">Outubro</span>
+                        <span class="summary-date">25/10</span>
+                    </div>
+                    <div class="summary-item special-item">
+                        <span class="summary-month">Novembro</span>
+                        <span class="summary-date">29/11</span>
+                        <span class="summary-label">5º Domingo</span>
+                    </div>
+                    <div class="summary-item no-event">
+                        <span class="summary-month">Dezembro</span>
+                        <span class="summary-date">Sem culto</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="nav-container">
+                <div class="month-selector">
+                    <button class="month-btn active" data-month="0" onclick="changeMonth(0)">Janeiro</button>
+                    <button class="month-btn" data-month="1" onclick="changeMonth(1)">Fevereiro</button>
+                    <button class="month-btn" data-month="2" onclick="changeMonth(2)">Março</button>
+                    <button class="month-btn" data-month="3" onclick="changeMonth(3)">Abril</button>
+                    <button class="month-btn" data-month="4" onclick="changeMonth(4)">Maio</button>
+                    <button class="month-btn" data-month="5" onclick="changeMonth(5)">Junho</button>
+                    <button class="month-btn" data-month="6" onclick="changeMonth(6)">Julho</button>
+                    <button class="month-btn" data-month="7" onclick="changeMonth(7)">Agosto</button>
+                    <button class="month-btn" data-month="8" onclick="changeMonth(8)">Setembro</button>
+                    <button class="month-btn" data-month="9" onclick="changeMonth(9)">Outubro</button>
+                    <button class="month-btn" data-month="10" onclick="changeMonth(10)">Novembro</button>
+                    <button class="month-btn" data-month="11" onclick="changeMonth(11)">Dezembro</button>
+                </div>
+            </div>
+
+            <div id="calendars"></div>
+
+            <!-- Special Notice -->
+            <div class="special-notice">
+                <h3>Informações Importantes</h3>
+                <ul>
+                    <li>Cultos de Missões acontecem no 4º domingo de cada mês</li>
+                    <li>Novembro: Culto será no 5º domingo (dia 29) devido ao Aniversário da Igreja</li>
+                    <li>Dezembro: Não haverá culto de missões</li>
+                    <li>Congresso de Missões: 25 e 26 de Abril</li>
+                </ul>
+            </div>
+
+            <!-- Legend -->
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color culto"></div>
+                    <span class="legend-text">Culto de Missões</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color congresso"></div>
+                    <span class="legend-text">Congresso de Missões</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <h3>Igreja Chamados para Adorar</h3>
+            <div class="footer-info">
+                <p>
+                    <span class="footer-icon">▪</span>
+                    R. Egas dos Santos, n°2 - Jardim São Paulo<br>
+                    Embu-Guaçu - SP, 06900-000
+                </p>
+                <p>
+                    <span class="footer-icon">▪</span>
+                    (11) 97315-1816
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Event data
+        const events = {
+            0: [{ day: 25, type: 'culto', title: 'Culto de Missões' }],
+            1: [{ day: 22, type: 'culto', title: 'Culto de Missões' }],
+            2: [{ day: 22, type: 'culto', title: 'Culto de Missões' }],
+            3: [
+                { day: 25, type: 'congress', title: 'Congresso de Missões - Dia 1' },
+                { day: 26, type: 'congress', title: 'Congresso de Missões - Dia 2' }
+            ],
+            4: [{ day: 24, type: 'culto', title: 'Culto de Missões' }],
+            5: [{ day: 28, type: 'culto', title: 'Culto de Missões' }],
+            6: [{ day: 26, type: 'culto', title: 'Culto de Missões' }],
+            7: [{ day: 23, type: 'culto', title: 'Culto de Missões' }],
+            8: [{ day: 27, type: 'culto', title: 'Culto de Missões' }],
+            9: [{ day: 25, type: 'culto', title: 'Culto de Missões' }],
+            10: [{ day: 29, type: 'culto', title: 'Culto de Missões - 5º Domingo' }],
+            11: [] // No events in December
+        };
+
+        const monthNames = [
+            'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+            'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+        ];
+
+        const dayNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+
+        function getDaysInMonth(month, year) {
+            return new Date(year, month + 1, 0).getDate();
+        }
+
+        function getFirstDayOfMonth(month, year) {
+            return new Date(year, month, 1).getDay();
+        }
+
+        function isEventDay(month, day) {
+            if (!events[month]) return null;
+            for (var i = 0; i < events[month].length; i++) {
+                if (events[month][i].day === day) {
+                    return events[month][i];
+                }
+            }
+            return null;
+        }
+
+        function createCalendar(month) {
+            var year = 2026;
+            var daysInMonth = getDaysInMonth(month, year);
+            var firstDay = getFirstDayOfMonth(month, year);
+
+            var html = '<div class="calendar-month' + (month === 0 ? ' active' : '') + '" data-month="' + month + '">';
+            html += '<h2 class="month-title">' + monthNames[month] + ' 2026</h2>';
+            html += '<div class="calendar-grid">';
+
+            // Day headers
+            for (var i = 0; i < dayNames.length; i++) {
+                html += '<div class="day-header">' + dayNames[i] + '</div>';
+            }
+
+            // Empty cells before first day
+            for (var i = 0; i < firstDay; i++) {
+                html += '<div class="day-cell empty"></div>';
+            }
+
+            // Days
+            for (var day = 1; day <= daysInMonth; day++) {
+                var date = new Date(year, month, day);
+                var isSunday = date.getDay() === 0;
+                var event = isEventDay(month, day);
+
+                var classes = 'day-cell';
+                if (isSunday) classes += ' sunday';
+                if (event) {
+                    classes += event.type === 'congress' ? ' congress' : ' event';
+                }
+
+                html += '<div class="' + classes + '">';
+                html += day;
+                
+                if (event) {
+                    var icon = event.type === 'congress' ? '★' : '✝';
+                    html += '<span class="event-icon">' + icon + '</span>';
+                    html += '<div class="tooltip">' + event.title + '</div>';
+                }
+                
+                html += '</div>';
+            }
+
+            html += '</div></div>';
+            return html;
+        }
+
+        // Generate all calendars
+        function generateAllCalendars() {
+            var calendarsContainer = document.getElementById('calendars');
+            var allCalendars = '';
+            
+            for (var month = 0; month < 12; month++) {
+                allCalendars += createCalendar(month);
+            }
+            
+            calendarsContainer.innerHTML = allCalendars;
+        }
+
+        // Função global para trocar de mês (chamada pelo onclick)
+        function changeMonth(monthIndex) {
+            console.log('Mudando para mês:', monthIndex);
+            
+            // Remove active de todos os botões
+            var buttons = document.getElementsByClassName('month-btn');
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].className = buttons[i].className.replace(' active', '');
+            }
+            
+            // Remove active de todos os calendários
+            var calendars = document.getElementsByClassName('calendar-month');
+            for (var i = 0; i < calendars.length; i++) {
+                calendars[i].className = calendars[i].className.replace(' active', '');
+            }
+            
+            // Adiciona active no botão clicado
+            var clickedButton = document.querySelector('.month-btn[data-month="' + monthIndex + '"]');
+            if (clickedButton) {
+                clickedButton.className += ' active';
+            }
+            
+            // Adiciona active no calendário correspondente
+            var targetCalendar = document.querySelector('.calendar-month[data-month="' + monthIndex + '"]');
+            if (targetCalendar) {
+                targetCalendar.className += ' active';
+            }
+            
+            console.log('Mês trocado com sucesso!');
+        }
+
+        // Month selector functionality
+        function setupMonthSelector() {
+            console.log('Setup concluído - usando onclick inline');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Iniciando calendário...');
+            generateAllCalendars();
+            setupMonthSelector();
+            console.log('Calendário inicializado com sucesso!');
+            
+            // Teste adicional para iOS
+            const buttons = document.querySelectorAll('.month-btn');
+            console.log('Botões encontrados:', buttons.length);
+        });
+    </script>
+</body>
+</html>
